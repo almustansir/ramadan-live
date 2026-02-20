@@ -7,48 +7,54 @@ export interface RamadanDay {
   maghrib: string;
 }
 
-/**
- * Ramadan Configuration
- * You can later move this to database for admin control
- */
 const RAMADAN_CONFIG = {
   year: 2026,
-  startDate: "2026-02-19", // ✅ Day 1 fixed
+  startDate: "2026-02-19", // Day 1
   totalDays: 30,
 
   location: {
     city: "Dhaka",
     country: "Bangladesh",
-    method: 1, // Karachi
-    school: 1, // Hanafi
+    method: 1,
+    school: 1,
     latitudeAdjustmentMethod: 3,
     timezone: "Asia/Dhaka",
   },
 };
+
+function formatToApiDate(date: Date) {
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = date.getFullYear();
+  return `${day}-${month}-${year}`; // Matches API format
+}
 
 export async function getRamadanCalendar(): Promise<RamadanDay[]> {
   const { year, startDate, totalDays, location } = RAMADAN_CONFIG;
 
   const start = new Date(startDate);
 
-  // We only need Feb + March for 2026 Ramadan
   const monthsNeeded = [2, 3];
-
   let allDays: any[] = [];
 
   for (const month of monthsNeeded) {
     const res = await fetch(
       `https://api.aladhan.com/v1/calendarByCity/${year}/${month}?city=${location.city}&country=${location.country}&method=${location.method}&school=${location.school}&latitudeAdjustmentMethod=${location.latitudeAdjustmentMethod}&timezonestring=${location.timezone}`,
-      {
-        next: { revalidate: 86400 }, // Cache for 24 hours
-      },
+      { cache: "no-store" },
     );
 
     if (!res.ok) {
-      throw new Error("Failed to fetch prayer times");
+      console.error("API error:", res.status);
+      return [];
     }
 
     const data = await res.json();
+
+    if (!data?.data) {
+      console.error("Invalid API response");
+      return [];
+    }
+
     allDays = [...allDays, ...data.data];
   }
 
@@ -58,24 +64,26 @@ export async function getRamadanCalendar(): Promise<RamadanDay[]> {
     const currentDate = new Date(start);
     currentDate.setDate(start.getDate() + i);
 
-    const iso = currentDate.toISOString().split("T")[0];
+    const formattedDate = formatToApiDate(currentDate);
 
-    const apiDay = allDays.find((d) => d.date.gregorian.date === iso);
+    const apiDay = allDays.find((d) => d.date.gregorian.date === formattedDate);
 
-    if (!apiDay) continue;
+    if (!apiDay) {
+      console.warn("Missing date:", formattedDate);
+      continue;
+    }
 
     ramadanDays.push({
       day: i + 1,
-      gregorianISO: iso,
-      gregorianDisplay: currentDate.toLocaleDateString("en-GB", {
-        day: "numeric",
-        month: "long",
-      }),
+      gregorianISO: formattedDate,
+      gregorianDisplay: `${apiDay.date.gregorian.day} ${apiDay.date.gregorian.month.en}`,
       hijriDisplay: `${apiDay.date.hijri.day} ${apiDay.date.hijri.month.en} ${apiDay.date.hijri.year} AH`,
       fajr: apiDay.timings.Fajr.split(" ")[0],
       maghrib: apiDay.timings.Maghrib.split(" ")[0],
     });
   }
+
+  console.log("Ramadan days generated:", ramadanDays.length);
 
   return ramadanDays;
 }

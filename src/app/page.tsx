@@ -11,9 +11,7 @@ export default async function Home() {
   return (
     <>
       <Navbar />
-
       <Container>
-        {/* HERO */}
         <section className="py-10 text-center">
           <h2 className="text-3xl sm:text-4xl font-bold text-emerald-800">
             Ramadan 2026
@@ -23,7 +21,12 @@ export default async function Home() {
           </p>
         </section>
 
-        {/* TODAY CARD */}
+        {ramadan.length === 0 && (
+          <div className="text-center py-10 text-red-500">
+            Failed to load Ramadan data.
+          </div>
+        )}
+
         {todayData && (
           <div className="bg-white rounded-3xl shadow-xl p-6 mb-10 text-center border border-emerald-100">
             <p className="text-xs uppercase tracking-wide text-gray-500">
@@ -54,43 +57,43 @@ export default async function Home() {
           </div>
         )}
 
-        {/* CALENDAR TABLE */}
-        <div className="bg-white rounded-3xl shadow overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-center text-sm sm:text-base">
-              <thead className="bg-emerald-100 text-emerald-900">
-                <tr>
-                  <th className="p-3">Day</th>
-                  <th>Date</th>
-                  <th>Sehri</th>
-                  <th>Iftar</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {ramadan.map((day) => (
-                  <tr
-                    key={day.day}
-                    className={`border-t transition ${
-                      day.gregorianISO === todayISO
-                        ? "bg-yellow-50 font-semibold"
-                        : "hover:bg-gray-50"
-                    }`}
-                  >
-                    <td className="p-3">{day.day}</td>
-                    <td>{day.gregorianDisplay}</td>
-                    <td>{day.fajr}</td>
-                    <td className="text-emerald-700 font-semibold">
-                      {day.maghrib}
-                    </td>
+        {ramadan.length > 0 && (
+          <div className="bg-white rounded-3xl shadow overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-center text-sm sm:text-base">
+                <thead className="bg-emerald-100 text-emerald-900">
+                  <tr>
+                    <th className="p-3">Day</th>
+                    <th>Date</th>
+                    <th>Sehri</th>
+                    <th>Iftar</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+                </thead>
 
-        {/* MOBILE SPACING */}
+                <tbody>
+                  {ramadan.map((day) => (
+                    <tr
+                      key={day.day}
+                      className={`border-t transition ${
+                        day.gregorianISO === todayISO
+                          ? "bg-yellow-50 font-semibold"
+                          : "hover:bg-gray-50"
+                      }`}
+                    >
+                      <td className="p-3">{day.day}</td>
+                      <td>{day.gregorianDisplay}</td>
+                      <td>{day.fajr}</td>
+                      <td className="text-emerald-700 font-semibold">
+                        {day.maghrib}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
         <div className="h-12" />
       </Container>
     </>
