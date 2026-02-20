@@ -11,28 +11,30 @@ export default async function Home() {
   return (
     <>
       <Navbar />
+
       <Container>
-        {/* Hero */}
+        {/* HERO */}
         <section className="py-10 text-center">
           <h2 className="text-3xl sm:text-4xl font-bold text-emerald-800">
             Ramadan 2026
           </h2>
           <p className="mt-2 text-gray-600 text-sm sm:text-base">
-            Sehri & Iftar timetable starting February 19
+            Day 1 starts February 19, 2026
           </p>
         </section>
 
-        {/* Today Card */}
+        {/* TODAY CARD */}
         {todayData && (
           <div className="bg-white rounded-3xl shadow-xl p-6 mb-10 text-center border border-emerald-100">
             <p className="text-xs uppercase tracking-wide text-gray-500">
               Today
             </p>
+
             <h3 className="text-lg font-semibold mt-1">
               {todayData.hijriDisplay}
             </h3>
 
-            <div className="flex justify-between mt-6">
+            <div className="flex justify-between items-center mt-6">
               <div className="flex-1">
                 <p className="text-xs text-gray-500">Sehri Ends</p>
                 <p className="text-2xl font-bold text-emerald-700">
@@ -40,7 +42,7 @@ export default async function Home() {
                 </p>
               </div>
 
-              <div className="w-px bg-gray-200 mx-4" />
+              <div className="w-px bg-gray-200 h-12" />
 
               <div className="flex-1">
                 <p className="text-xs text-gray-500">Iftar Starts</p>
@@ -52,7 +54,7 @@ export default async function Home() {
           </div>
         )}
 
-        {/* Calendar Table */}
+        {/* CALENDAR TABLE */}
         <div className="bg-white rounded-3xl shadow overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-center text-sm sm:text-base">
@@ -64,6 +66,7 @@ export default async function Home() {
                   <th>Iftar</th>
                 </tr>
               </thead>
+
               <tbody>
                 {ramadan.map((day) => (
                   <tr
@@ -74,7 +77,7 @@ export default async function Home() {
                         : "hover:bg-gray-50"
                     }`}
                   >
-                    <td className="p-2">{day.day}</td>
+                    <td className="p-3">{day.day}</td>
                     <td>{day.gregorianDisplay}</td>
                     <td>{day.fajr}</td>
                     <td className="text-emerald-700 font-semibold">
@@ -87,8 +90,8 @@ export default async function Home() {
           </div>
         </div>
 
-        {/* Bottom spacing for mobile */}
-        <div className="h-10" />
+        {/* MOBILE SPACING */}
+        <div className="h-12" />
       </Container>
     </>
   );
